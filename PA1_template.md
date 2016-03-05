@@ -1,20 +1,17 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r echo = TRUE}
+
+```r
 data <- read.csv("activity.csv")
 data$date <- as.Date(data$date, "%Y-%m-%d")
 ```
 
 
 ## What is mean total number of steps taken per day?
-```{r echo = TRUE, message = FALSE}
+
+```r
 library(dplyr)
 dataGroupedByDay <- group_by(data, date)
 totalStepsByDay <- summarize(dataGroupedByDay, stepsByDay =
@@ -23,16 +20,31 @@ title = "Histogram of Total Steps By Day"
 hist(totalStepsByDay$stepsByDay, xlab = "Steps", main = title)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-2-1.png)
+
 
 #### Mean and median of the total number of steps taken per day
-```{r echo = TRUE, message = FALSE}
+
+```r
 mean(totalStepsByDay$stepsByDay)
+```
+
+```
+## [1] 9354.23
+```
+
+```r
 median(totalStepsByDay$stepsByDay)
+```
+
+```
+## [1] 10395
 ```
 
 
 ## What is the average daily activity pattern?
-```{r echo = TRUE, message = FALSE}
+
+```r
 dataGroupedByInterval <- group_by(data, interval)
 meanStepsByInterval <- summarize(dataGroupedByInterval, stepsByInterval =
                                  mean(steps, na.rm = TRUE))
@@ -52,22 +64,35 @@ text(xMax, yMax, paste0("Max mean number of steps (",
      pos = 4, col = "red")
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)
+
 
 #### 5-minute interval with max mean number of steps
-```{r echo = TRUE, message = FALSE}
+
+```r
 print(xMax)
+```
+
+```
+## [1] 835
 ```
 
 
 ## Imputing missing values
 
 #### Number of missing values in the dataset
-```{r echo = TRUE, message = FALSE}
+
+```r
 sum( ! complete.cases(data))
 ```
 
+```
+## [1] 2304
+```
+
 #### Replace missing values with the mean for the 5-minute interval
-```{r echo = TRUE, message = FALSE}
+
+```r
 data <- merge(data, meanStepsByInterval)
 data$steps <- ifelse(is.na(data$steps), data$stepsByInterval,
                      data$steps)
@@ -84,11 +109,25 @@ title = "Histogram of Total Steps By Day with Imputing Data"
 hist(totalStepsByDay$stepsByDay, xlab = "Steps", main = title)
 ```
 
+![](PA1_template_files/figure-html/unnamed-chunk-7-1.png)
+
 
 #### Mean and median of the total number of steps taken per day with imputing data
-```{r echo = TRUE, message = FALSE}
+
+```r
 mean(totalStepsByDay$stepsByDay)
+```
+
+```
+## [1] 10766.19
+```
+
+```r
 median(totalStepsByDay$stepsByDay)
+```
+
+```
+## [1] 10766.19
 ```
 
 
@@ -101,11 +140,18 @@ median(totalStepsByDay$stepsByDay)
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r echo = TRUE, message = FALSE, warning = FALSE}
+
+```r
 # Save locale in use to establish USA english locale
 locale <- Sys.getlocale("LC_ALL")
 Sys.setlocale("LC_ALL", "en_US.utf8")
+```
 
+```
+## [1] "LC_CTYPE=en_US.utf8;LC_NUMERIC=C;LC_TIME=en_US.utf8;LC_COLLATE=en_US.utf8;LC_MONETARY=en_US.utf8;LC_MESSAGES=es_MX.UTF-8;LC_PAPER=es_MX.UTF-8;LC_NAME=C;LC_ADDRESS=C;LC_TELEPHONE=C;LC_MEASUREMENT=es_MX.UTF-8;LC_IDENTIFICATION=C"
+```
+
+```r
 dayType <- ifelse(weekdays(data$date) %in% c("Saturday", "Sunday"),
                   "weekend", "weekday")
 data <- mutate(data, steps, date, interval,
@@ -122,7 +168,15 @@ xyplot(stepsByInterval ~ interval | dayType, lwd = 1.5,
        data = meanStepsByDayTypeAndInterval, type = "l",
        layout = c(1, 2), xlab = "Interval", ylab = "Number of Steps",
        main = title)
+```
 
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)
+
+```r
 # Re-set locale in use
 Sys.setlocale("LC_ALL", locale)
+```
+
+```
+## [1] ""
 ```
